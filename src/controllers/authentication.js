@@ -44,7 +44,9 @@ export const login = async (req, res) => {
     return res.status(200).json(userLoginResponse).end();
   } catch (error) {
     console.log(error);
-    return res.status(400).json();
+    return res
+      .status(400)
+      .json({ mensagem: 'Erro de Solicitação: os dados fornecidos são inválidos ou ausentes' });
   }
 };
 
@@ -94,7 +96,7 @@ export const register = async (req, res) => {
     return res.status(201).json(userResponse).end();
   } catch (error) {
     console.info(error);
-    return res.status(500).json({ message: 'Erro do Servidor Interno' });
+    return res.status(500).json({ mensagem: 'Erro do Servidor Interno' });
   }
 };
 
@@ -102,17 +104,16 @@ export const isAuthenticated = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
-    return res.sendStatus(403);
+    return res.status(403).json({ mensagem: 'Proibido: Cabeçalho de autorização ausente' });
   }
 
   const token = authHeader.split(' ')[1];
   const decoded = verifyJwtToken(token);
 
   if (!decoded) {
-    return res.sendStatus(403);
+    return res.status(403).json({ mensagem: 'Proibido: Token inválido' });
   }
 
-  // Você pode armazenar o usuário decodificado para uso posterior, se necessário
   req.user = decoded;
 
   return next();

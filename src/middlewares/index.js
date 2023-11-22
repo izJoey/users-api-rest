@@ -46,7 +46,7 @@ export const isAuthenticated = async (req, res, next) => {
       return res.sendStatus(403);
     }
 
-    req.identity = existingUser; // Atualiza o objeto de identidade
+    req.identity = existingUser;
 
     return next();
   } catch (error) {

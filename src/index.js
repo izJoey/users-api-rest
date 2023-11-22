@@ -5,7 +5,6 @@ import cookieParser from 'cookie-parser';
 import compression from 'compression';
 import cors from 'cors';
 import mongoose from 'mongoose';
-// import error from 'console';
 
 import router from './routers/index.js';
 
@@ -19,7 +18,7 @@ app.use(
 
 app.use(compression());
 app.use(cookieParser());
-app.use(bodyParser.json()); // verificar opcao app.use(express.json());
+app.use(bodyParser.json());
 
 const server = http.createServer(app);
 

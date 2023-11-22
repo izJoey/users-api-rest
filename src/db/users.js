@@ -37,13 +37,9 @@ export const getUserBySessionToken = (jwtToken) =>
     'authentication.jwtToken': jwtToken,
   });
 export const getUserById = (id) => UserModel.findById(id);
-//export const createUser = (values) => new UserModel(values).save().then((user) => user.toObject());
 export const createUser = async (values) => {
   const user = new UserModel(values);
-  return user.save(); // Retorna a Promise resultante da operação save()
+  return user.save();
 };
 export const deleteUserById = (id) => UserModel.findOneAndDelete({ _id: id });
 export const updateUserById = (id, values) => UserModel.findByIdAndUpdate(id, values);
-
-//export const createUser = (values: Record<string, any>) => new UserModel(values).save().then((user) => user.toObject());
-//export const updateUserById = (id: string, values: Record<string, any>) => UserModel.findByIdAndUpdate(id, values);
