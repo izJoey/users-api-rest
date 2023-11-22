@@ -8,10 +8,16 @@
 // };
 
 import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 
 const SECRET = 'JOEY-REST-API';
 
 export const random = () => crypto.randomBytes(128).toString('base64');
 export const authentication = (salt, password) => {
-    return crypto.createHmac('sha256', [salt, password].join('/')).update(SECRET).digest('hex');
+  return crypto.createHmac('sha256', [salt, password].join('/')).update(SECRET).digest('hex');
+};
+
+export const generateSessionToken = (_id) => {
+  const payload = { _id };
+  return jwt.sign(payload, SECRET, { expiresIn: '1h' }); // O token expira em 1 hora
 };

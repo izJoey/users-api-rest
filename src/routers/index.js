@@ -6,8 +6,8 @@ import { users } from './users.js';
 const router = express.Router();
 
 export default () => {
-    authentication(router);
-    users(router);
+  authentication(router);
+  users(router);
 
-    return router;
+  return router;
 };

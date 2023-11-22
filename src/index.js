@@ -12,22 +12,23 @@ import router from './routers/index.js';
 const app = express();
 
 app.use(
-    cors({
-        credentials: true
-    })
+  cors({
+    credentials: true,
+  })
 );
 
 app.use(compression());
 app.use(cookieParser());
-app.use(bodyParser.json());
+app.use(bodyParser.json()); // verificar opcao app.use(express.json());
 
 const server = http.createServer(app);
 
 server.listen(8080, () => {
-    console.log('Server running on http://localhost:8080/');
+  console.log('Server running on http://localhost:8080/');
 });
 
-const MONGO_URL = 'mongodb+srv://joeyrjtd:xARCNPuc0zHRBjml@cluster0.hx17crl.mongodb.net/?retryWrites=true&w=majority';
+const MONGO_URL =
+  'mongodb+srv://joeyrjtd:xARCNPuc0zHRBjml@cluster0.hx17crl.mongodb.net/?retryWrites=true&w=majority';
 
 mongoose.Promise = Promise;
 mongoose.connect(MONGO_URL);
