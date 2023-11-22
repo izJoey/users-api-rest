@@ -1,14 +1,17 @@
 import express from 'express';
+import jwt from 'jsonwebtoken';
 
 import { createUser, getUserByEmail } from '../db/users.js';
 import { random, authentication, generateSessionToken } from '../helpers/index.js';
+
+let globalJwtToken = null;
 
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json();
+      return res.status(400).json({ mensagem: 'Usuário e/ou senha inválidos' });
     }
 
     const user = await getUserByEmail(email).select(
@@ -16,23 +19,45 @@ export const login = async (req, res) => {
     );
 
     if (!user) {
-      return res.status(400).json();
+      return res.status(401).json({ mensagem: 'Usuário e/ou senha inválidos' });
     }
 
     const expectedHash = authentication(user.authentication.salt, password);
 
     if (user.authentication.password !== expectedHash) {
-      return res.status(403).json();
+      return res.status(401).json({ mensagem: 'Usuário e/ou senha inválidos' });
     }
 
-    const salt = random();
-    user.authentication.sessionToken = authentication(salt, user._id.toString());
+    // const salt = random();
+
+    // user.authentication.sessionToken = authentication(salt, user._id.toString());
+
+    //const sessionToken = generateSessionToken(user._id.toString());
+    //user.authentication.sessionToken = sessionToken;
+
+    const jwtToken = generateSessionToken(user._id);
+    user.authentication.jwtToken = jwtToken;
+    globalJwtToken = jwtToken;
+
+    user.ultimo_login = new Date();
 
     await user.save();
 
-    res.cookie('JOEY-AUTH', user.authentication.sessionToken, { domain: 'localhost', path: '/' });
+    //res.cookie('JOEY-AUTH', user.authentication.sessionToken, { domain: 'localhost', path: '/' });
+    //res.setHeader('Authorization', `Bearer ${user.authentication.sessionToken}`);
+    //const jwtToken = jwt.sign({ _id: user._id }, 'your-secret-key', { expiresIn: '1h' });
+    //const jwtToken = generateSessionToken(user._id);
+    res.setHeader('Authorization', `Bearer ${jwtToken}`);
 
-    return res.status(200).json(user).end();
+    const userLoginResponse = {
+      id: user._id,
+      data_criacao: user.data_criacao,
+      data_atualizacao: user.data_atualizacao,
+      ultimo_login: user.ultimo_login,
+      token: jwtToken,
+    };
+
+    return res.status(200).json(userLoginResponse).end();
   } catch (error) {
     console.log(error);
     return res.status(400).json();
@@ -54,7 +79,7 @@ export const register = async (req, res) => {
     const existingUser = await getUserByEmail(email);
 
     if (existingUser) {
-      return res.status(400).json({ mensagem: 'E-mail já existe' });
+      return res.status(400).json({ mensagem: 'E-mail já existente' });
     }
 
     const salt = random();
@@ -70,16 +95,22 @@ export const register = async (req, res) => {
       },
     });
 
-    const sessionToken = generateSessionToken(user._id.toString());
+    //const sessionToken = generateSessionToken(user._id.toString());
 
-    user.authentication.sessionToken = sessionToken; /// maybe not be necessary
+    const jwtToken = generateSessionToken(user._id);
+    user.authentication.jwtToken = jwtToken;
+    globalJwtToken = jwtToken;
+
+    await user.save();
+
+    //user.authentication.sessionToken = sessionToken; /// maybe not be necessary
 
     const userResponse = {
       id: user._id,
       data_criacao: user.data_criacao,
       data_atualizacao: user.data_atualizacao,
       ultimo_login: user.ultimo_login,
-      token: sessionToken,
+      token: jwtToken,
     };
 
     return res.status(201).json(userResponse).end(); //.json({ mensagem: 'Usuário registrado com sucesso' });

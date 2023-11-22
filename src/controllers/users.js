@@ -7,6 +7,13 @@ export const getAllUsers = async (req, res) => {
   try {
     const users = await getUsers();
 
+    //const user = await getUserById(id);
+
+    //const jwtToken = generateJwtToken(user._id);
+    //res.setHeader('Authorization', `Bearer ${jwtToken}`);
+
+    //res.setHeader('Authorization', `Bearer ${user.authentication.sessionToken}`);
+
     return res.status(200).json(users);
   } catch (error) {
     console.log(error);

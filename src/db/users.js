@@ -6,7 +6,7 @@ const UserSchema = new mongoose.Schema({
   authentication: {
     password: { type: String, required: true, select: false },
     salt: { type: String, select: false },
-    sessionToken: { type: String, select: false },
+    jwtToken: { type: String, select: false },
   },
   telefones: [
     {
@@ -37,7 +37,11 @@ export const getUserBySessionToken = (sessionToken) =>
     'authentication.sessionToken': sessionToken,
   });
 export const getUserById = (id) => UserModel.findById(id);
-export const createUser = (values) => new UserModel(values).save().then((user) => user.toObject());
+//export const createUser = (values) => new UserModel(values).save().then((user) => user.toObject());
+export const createUser = async (values) => {
+  const user = new UserModel(values);
+  return user.save(); // Retorna a Promise resultante da operação save()
+};
 export const deleteUserById = (id) => UserModel.findOneAndDelete({ _id: id });
 export const updateUserById = (id, values) => UserModel.findByIdAndUpdate(id, values);
 

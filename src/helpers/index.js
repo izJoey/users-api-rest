@@ -21,3 +21,13 @@ export const generateSessionToken = (_id) => {
   const payload = { _id };
   return jwt.sign(payload, SECRET, { expiresIn: '1h' }); // O token expira em 1 hora
 };
+
+export const verifyJwtToken = (token) => {
+  try {
+    const decoded = jwt.verify(token, SECRET);
+    return decoded;
+  } catch (err) {
+    // O token não é válido
+    return null;
+  }
+};
