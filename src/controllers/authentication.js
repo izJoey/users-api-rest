@@ -1,10 +1,6 @@
 import express from 'express';
-import jwt from 'jsonwebtoken';
-
 import { createUser, getUserByEmail } from '../db/users.js';
 import { random, authentication, generateSessionToken } from '../helpers/index.js';
-
-let globalJwtToken = null;
 
 export const login = async (req, res) => {
   try {
@@ -28,25 +24,13 @@ export const login = async (req, res) => {
       return res.status(401).json({ mensagem: 'Usuário e/ou senha inválidos' });
     }
 
-    // const salt = random();
-
-    // user.authentication.sessionToken = authentication(salt, user._id.toString());
-
-    //const sessionToken = generateSessionToken(user._id.toString());
-    //user.authentication.sessionToken = sessionToken;
-
     const jwtToken = generateSessionToken(user._id);
     user.authentication.jwtToken = jwtToken;
-    globalJwtToken = jwtToken;
 
     user.ultimo_login = new Date();
 
     await user.save();
 
-    //res.cookie('JOEY-AUTH', user.authentication.sessionToken, { domain: 'localhost', path: '/' });
-    //res.setHeader('Authorization', `Bearer ${user.authentication.sessionToken}`);
-    //const jwtToken = jwt.sign({ _id: user._id }, 'your-secret-key', { expiresIn: '1h' });
-    //const jwtToken = generateSessionToken(user._id);
     res.setHeader('Authorization', `Bearer ${jwtToken}`);
 
     const userLoginResponse = {
@@ -91,19 +75,13 @@ export const register = async (req, res) => {
       authentication: {
         salt,
         password: authentication(salt, password),
-        //sessionToken,
       },
     });
 
-    //const sessionToken = generateSessionToken(user._id.toString());
-
     const jwtToken = generateSessionToken(user._id);
     user.authentication.jwtToken = jwtToken;
-    globalJwtToken = jwtToken;
 
     await user.save();
-
-    //user.authentication.sessionToken = sessionToken; /// maybe not be necessary
 
     const userResponse = {
       id: user._id,
@@ -113,23 +91,42 @@ export const register = async (req, res) => {
       token: jwtToken,
     };
 
-    return res.status(201).json(userResponse).end(); //.json({ mensagem: 'Usuário registrado com sucesso' });
+    return res.status(201).json(userResponse).end();
   } catch (error) {
     console.info(error);
     return res.status(500).json({ message: 'Erro do Servidor Interno' });
   }
 };
 
+export const isAuthenticated = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.sendStatus(403);
+  }
+
+  const token = authHeader.split(' ')[1];
+  const decoded = verifyJwtToken(token);
+
+  if (!decoded) {
+    return res.sendStatus(403);
+  }
+
+  // Você pode armazenar o usuário decodificado para uso posterior, se necessário
+  req.user = decoded;
+
+  return next();
+};
+
 const validateTelefones = (telefones) => {
-  const regexNumero = /^\d{9}$/; // Número de telefone deve ter 9 dígitos
-  const regexDDD = /^\d{2}$/; // DDD deve ter 2 dígitos
+  const regexNumero = /^\d{9}$/;
+  const regexDDD = /^\d{2}$/;
+
   for (const telefone of telefones) {
-    if (!regexNumero.test(telefone.numero)) {
-      return false;
-    }
-    if (!regexDDD.test(telefone.ddd)) {
+    if (!regexNumero.test(telefone.numero) || !regexDDD.test(telefone.ddd)) {
       return false;
     }
   }
+
   return true;
 };
