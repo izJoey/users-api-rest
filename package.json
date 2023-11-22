@@ -7,12 +7,15 @@
     "scripts": {
         "start": "npm-run-all build:dev start:server",
         "build:dev": "echo 'Build development assets here'",
-        "start:server": "node index.js",
+        "start:server": "nodemon index.js",
         "test": "jest"
     },
     "keywords": [],
     "author": "Robert Joseph",
     "license": "ISC",
+    "engines": {
+    "node": "16.x"
+    },
     "devDependencies": {
         "body-parser": "^1.20.2",
         "compression": "^1.7.4",
