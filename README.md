@@ -3,7 +3,7 @@
 **Descrição:**
 ====
 
-Projeto feito em Node.js e Express:
+Projeto feito em Node.js, Express e MongoDB:
 
 Deployment foi feito no Render:
 
@@ -61,7 +61,7 @@ Deployment foi feito no Render:
 
 **Cabeçalho da requisição:**
 
-- Authorization: token JWT
+- Authorization: Barear {token}
 
 **Resposta:**
 
@@ -83,7 +83,7 @@ Deployment foi feito no Render:
 
 **Cabeçalho da requisição:**
 
-- Authorization: token JWT
+- Authorization: Barear {token}
 
 **Parâmetro:**
 
@@ -99,7 +99,7 @@ Deployment foi feito no Render:
 
 **Cabeçalho da requisição:**
 
-- Authorization: token JWT
+- Authorization: Barear {token}
 
 **Requisição:**
 
